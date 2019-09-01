@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, TextAreaField, HiddenField, TextField
 from wtforms.validators import DataRequired, Email, ValidationError, EqualTo
-from app.models import User
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
+from app.models import User, CostCenter
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -27,10 +28,14 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('Please enter a different email')
 
 class ClockInForm(FlaskForm):
-    jobname = SelectField(u'Job Type', choices=[('t1','test1'),('t2','test2')])
+    jobname = SelectField(coerce=int)
     submit = SubmitField('Clock In', id="clockInButton")
     latitude = HiddenField(id="lat")
     longitude = HiddenField(id="lon")
+
+    def __init__(self, *args, **kwargs):
+        super(ClockInForm, self).__init__(*args, **kwargs)
+        self.jobname.choices = [(c.id, c.name) for c in CostCenter.query.all()]
 
 
 class ClockOutForm(FlaskForm):

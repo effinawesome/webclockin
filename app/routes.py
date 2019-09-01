@@ -71,11 +71,10 @@ def clockin():
         timesheet.starttime = datetime.now().replace(microsecond=0)
         timesheet.clockedin = 1
         timesheet.inlocation = loc
+        timesheet.costcenter = form.jobname.data
         db.session.add(timesheet)
         db.session.commit()
         return redirect(url_for('clockout'))
-        #else:
-        #    return redirect(url_for('clockin'))
     return render_template('clockin.html',title='Clock In',form=form, clockedintime=str(hoursClockedIn) + " hours and " + str(minutesClockedIn) + " minutes")
 
 @app.route('/clockout', methods=['GET','POST'])
@@ -124,12 +123,16 @@ def getTotalClockedInTime():
     friday = today + timedelta(5 + idx)
     print(saturday)
     print(friday)
-    #q = Timesheet.query.filter(and_(func.date(Timesheet.date) >= saturday, func.date(Timesheet.date) <= friday, Timesheet.employee == current_user.id)).all()
     q = Timesheet.query.filter(Timesheet.starttime.between(saturday,friday), Timesheet.employee == current_user.id).all()
-    #print(q)
     for row in q:
         if row.totaltime is not None:
             totalClockedInTime += int(row.totaltime)
-    #print(totalClockedInTime)
-    db.session.commit()
     return totalClockedInTime
+
+@app.route('/admin', methods = ['GET','POST'])
+def admin():
+    admin = User.query.filter(and_(User.id == current_user.id, User.usertype == '1')).first()
+    if admin is not None:
+        return render_template("admin.html", title="Administrator", user = current_user, data=data)
+    else:
+        return redirect(url_for('index'))
