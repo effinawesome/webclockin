@@ -50,47 +50,58 @@ def register():
 @app.route('/clockin', methods=['GET','POST'])
 @login_required
 def clockin():
+    timesheet = Timesheet()
     tcit = getTotalClockedInTime()
     hoursClockedIn = floor(int(tcit) / 60)
     minutesClockedIn = int(tcit) % 60
+    clocked = timesheet.query.filter_by(employee = current_user.id, clockedin = '1').first()
+    print("current_user.id: " + str(current_user.id))
+    print("clocked ( clock in) :" + str(clocked))
+    if clocked is not None:
+        return redirect(url_for('clockout'))
     form = ClockInForm()
     if form.validate_on_submit():
-        timesheet = Timesheet()
         loc = str(form.latitude.data) + " " + str(form.longitude.data)
         print("location from clock in(a): " + loc)
-        clocked = timesheet.query.filter(Timesheet.employee == current_user.id, Timesheet.clockedin == '1').first()
-        print(clocked)
-        if clocked is None:
-            timesheet.employee = current_user.id
-            timesheet.starttime = datetime.now().replace(microsecond=0)
-            timesheet.clockedin = 1
-            timesheet.inlocation = loc
-            db.session.add(timesheet)
-            db.session.commit()
-            return redirect(url_for('clockout'))
-        else:
-            return redirect(url_for('clockin'))
+        #clocked = timesheet.query.filter(Timesheet.employee == current_user.id, Timesheet.clockedin == '1').first()
+        #print(clocked)
+        #if clocked is None:
+        timesheet.employee = current_user.id
+        timesheet.starttime = datetime.now().replace(microsecond=0)
+        timesheet.clockedin = 1
+        timesheet.inlocation = loc
+        db.session.add(timesheet)
+        db.session.commit()
+        return redirect(url_for('clockout'))
+        #else:
+        #    return redirect(url_for('clockin'))
     return render_template('clockin.html',title='Clock In',form=form, clockedintime=str(hoursClockedIn) + " hours and " + str(minutesClockedIn) + " minutes")
 
 @app.route('/clockout', methods=['GET','POST'])
 @login_required
 def clockout():
+    timesheet = Timesheet()
     form = ClockOutForm()
+    clocked = timesheet.query.filter(and_(timesheet.employee == current_user.id, timesheet.clockedin == '1')).all()
+    print("current_user.id: " + str(current_user.id))
+    print("clocked ( clock out) :" + str(clocked))
+    if clocked is None:
+        return redirect(url_for('clockin'))
     if form.validate_on_submit():
-        clocked = Timesheet.query.filter(Timesheet.employee == current_user.id, Timesheet.clockedin == '1').first()
         loc = str(form.latitude.data) + " " + str(form.longitude.data)
         if clocked is not None:
-            clocked.employee= current_user.id
-            clocked.endtime = datetime.now().replace(microsecond=0)
-            clocked.outlocation = loc
-            clocked.notes = form.notes.data
-            td = clocked.endtime - clocked.starttime
+            timesheet.employee = current_user.id
+            end = datetime.now().replace(microsecond=0)
+            timesheet.endtime = end
+            timesheet.outlocation = loc
+            timesheet.notes = form.notes.data
+            td = end - timesheet.starttime
             hours = td.seconds / 3600
             minutes = td.seconds % 3600 / 60
-            clocked.totaltime = str(round(hours*60+minutes))
+            timesheet.totaltime = str(round(hours*60+minutes))
             print(form.notes.data)
-            clocked.clockedin = 0
-            db.session.add(clocked)
+            timesheet.clockedin = 0
+            db.session.add(timesheet)
             db.session.commit()
             return redirect(url_for('clockin'))
         else:
@@ -107,7 +118,7 @@ def clockinBGprocess():
 def getTotalClockedInTime():
     totalClockedInTime = 0
     today = date.today()
-    idx = (today.weekday() + 1) % 7  # MON = 0, SUN = 6 -> SUN = 0 .. SAT = 6
+    idx = (today.weekday() + 1) % 7
     saturday = today - timedelta(1 + idx)
     friday = today + timedelta(5 + idx)
     print(saturday)
@@ -116,7 +127,8 @@ def getTotalClockedInTime():
     q = Timesheet.query.filter(Timesheet.starttime.between(saturday,friday), Timesheet.employee == current_user.id).all()
     print(q)
     for row in q:
-        totalClockedInTime += int(row.totaltime)
+        if row.totaltime is not None:
+            totalClockedInTime += int(row.totaltime)
     print(totalClockedInTime)
-
+    db.session.commit()
     return totalClockedInTime
