@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+    <h1>Clock Out</h1>
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.quick_form(form) }}
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+            <script type="text/javascript">
+                window.onload = function() {
+            	// setup the button click
+	            //document.getElementById("clockInButton").onclick = function() {
+		        getLocation()
+	            }
+	            la = document.getElementById("lat");
+                lo = document.getElementById("lon")
+
+
+                function getLocation() {
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(showPosition);
+                    }
+                    }
+
+                function showPosition(position) {
+                    var location = "";
+                    la.value = position.coords.latitude;
+                    lo.value = position.coords.longitude;
+                    location += location + position.coords.latitude + " " + position.coords.longitude;
+                }
+            </script>
+        </div>
+    </div>
+{% endblock %}
