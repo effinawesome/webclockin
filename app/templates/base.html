@@ -4,6 +4,23 @@
     {% if title %}{{ title }}{% else %}Clock In{% endif %}
 {% endblock %}
 
+
+    {% block navbar %}
+{% if current_user.is_authenticated %}
+        <nav class="navbar navbar-default">
+            <div class="container">
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        {% endif %}
+    {% endblock %}
+
 {% block content %}
     <div class="container">
         {% with messages = get_flashed_messages() %}

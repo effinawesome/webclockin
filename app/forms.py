@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, TextAreaField, HiddenField, TextField
 from wtforms.validators import DataRequired, Email, ValidationError, EqualTo
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from app.models import User, CostCenter
+from app.models import User, CostCenter, Role
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -12,6 +12,7 @@ class LoginForm(FlaskForm):
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
+    realname = StringField('Full Name', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     password2 = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
@@ -43,3 +44,11 @@ class ClockOutForm(FlaskForm):
     submit = SubmitField('Clock Out')
     latitude = HiddenField(id="lat")
     longitude = HiddenField(id="lon")
+
+class SelectEmployeeForm(FlaskForm):
+    employee = SelectField(coerce=int)
+    submit = SubmitField('Get Timecard Data')
+
+    def __init__(self, *args, **kwargs):
+        super(SelectEmployeeForm, self).__init__(*args, **kwargs)
+        self.employee.choices = [(c.id, c.realname) for c in User.query.filter(User.usertype != 1)]

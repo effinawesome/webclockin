@@ -1,0 +1,36 @@
+{% extends "adminbase.html" %}
+
+{% block content %}
+    <div class="container center"><h2 align="center">{{ employee }} Clocked in for {{ clockedintime }} this week</h2></div>
+    <div class="container-fluid">
+    <table class="table table-hover table-bordered table-condensed table-responsive table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Start Time</th>
+                <th scope="col">End Time</th>
+                <th scope="col">Total Minutes</th>
+                <th scope="col">Clock In Location</th>
+                <th scope="col">Clock Out Location</th>
+                <th scope="col">Notes</th>
+                <th scope="col">Cost Center</th>
+            </tr>
+        </thead>
+    <tbody>
+    {% for item in data %}
+        <tr>
+            <th scope="row">{{ item.date }}</th>
+            <td>{{ item.starttime }}</td>
+            <td>{{ item.endtime }}</td>
+            <td>{{ item.totaltime }}</td>
+            <td>{{ item.inlocation }}</td>
+            <td>{{ item.outlocation }}</td>
+            <td>{{ item.notes }}</td>
+            <td>{{ costcenter[item.costcenter-1] }}</td>
+        </tr>
+
+    {% endfor %}
+    </tbody>
+    </table>
+    </div>
+{% endblock %}

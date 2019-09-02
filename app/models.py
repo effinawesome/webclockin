@@ -12,7 +12,7 @@ class User(UserMixin, db.Model):
     usertype = db.Column(db.Integer, db.ForeignKey('role.id'))
 
     def __repr__(self):
-        return '<User {}>'.format(self.username)
+        return '{}'.format(self.realname)
 
     def set_password(self,password):
         self.password_hash = generate_password_hash(password)
