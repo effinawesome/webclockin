@@ -14,10 +14,7 @@
                 <script type="text/javascript">
 
                     window.onload = function() {
-
-                        // setup the button click
-                    //document.getElementById("clockInButton").onclick = function() {
-                    getLocation()
+                        getLocation()
                     };
                     la = document.getElementById("lat");
                     lo = document.getElementById("lon");
@@ -33,6 +30,7 @@
                                 enableHighAccuracy: true,
                                 timeout: 8500,
                                 maximumWait: 7500,
+                                desiredAccuracy: 50,
                                 maximumAge: 0
                         };
                             navigator.geolocation.getCurrentPosition(showPosition, error, options);

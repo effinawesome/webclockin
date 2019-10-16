@@ -66,7 +66,7 @@ def clockin():
         return redirect(url_for('clockout'))
     form = ClockInForm()
     if form.validate_on_submit():
-        loc = str(form.latitude.data) + " " + str(form.longitude.data)
+        loc = str(form.latitude.data) + "," + str(form.longitude.data)
         print("location from clock in(a): " + loc)
         #clocked = timesheet.query.filter(Timesheet.employee == current_user.id, Timesheet.clockedin == '1').first()
         #print(clocked)
@@ -92,7 +92,7 @@ def clockout():
     if clocked is None:
         return redirect(url_for('clockin'))
     if form.validate_on_submit():
-        loc = str(form.latitude.data) + " " + str(form.longitude.data)
+        loc = str(form.latitude.data) + "," + str(form.longitude.data)
         if clocked is not None:
             clocked.employee = current_user.id
             end = datetime.now().replace(microsecond=0)

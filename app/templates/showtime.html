@@ -23,7 +23,7 @@
             <td>{{ item.starttime }}</td>
             <td>{{ item.endtime }}</td>
             <td>{{ item.totaltime }}</td>
-            <td>{{ item.inlocation }}</td>
+            <td><a href="maps.google.com/maps/place/{{ item.inlocation }}>"{{ item.inlocation }}</a></td>
             <td>{{ item.outlocation }}</td>
             <td>{{ item.notes }}</td>
             <td>{{ costcenter[item.costcenter-1] }}</td>
