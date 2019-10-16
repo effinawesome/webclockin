@@ -45,8 +45,8 @@
                         console.log(`Longitude: ${crd.longitude}`);
                         console.log(`More or less ${crd.accuracy} meters.`);
                         var location = "";
-                        la.value = position.coords.latitude;
-                        lo.value = position.coords.longitude;
+                        la.value = ${crd.latitude};
+                        lo.value = ${crd.longitude};
                         location += location + position.coords.latitude + " " + position.coords.longitude;
                     }
                 </script>
